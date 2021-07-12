@@ -1,0 +1,27 @@
+micronaut:
+  application:
+    name: keyManagergRPC
+
+grpc:
+  server:
+    port: ${SERVER_PORT:50051}
+    keep-alive-time: 1h
+    max-inbound-message-size: 1024
+
+
+datasources:
+  default:
+    url: ${DB_URI:`jdbc:postgresql://localhost:15432/key_manager_grpc`}
+    driverClassName: org.postgresql.Driver
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:zupper}
+    schema-generate: CREATE_DROP
+    dialect: ${DB_DIALECT:POSTGRES}
+
+
+jpa.default.properties.hibernate.hbm2ddl.auto: update
+jpa.default.properties.hibernate.show_sql: true
+
+itau:
+  contas:
+    url: ${ITAU_URL:`http://localhost:9091`}
