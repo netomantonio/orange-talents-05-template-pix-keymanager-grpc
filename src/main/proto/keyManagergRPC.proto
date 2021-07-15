@@ -11,6 +11,20 @@ service KeyManagerRegistraGrpcService {
   rpc registrar (RegistraChaveRequest) returns (RegistraChaveResponse) {}
 }
 
+service KeyManagerRemoveGrpcService{
+  rpc remover (RemoveChaveRequest) returns (RemoveChaveResponse) {}
+}
+
+message RemoveChaveRequest {
+  string pixId = 1;
+  string clienteId = 2;
+
+}
+
+message RemoveChaveResponse {
+  string info = 1;
+}
+
 
 message RegistraChaveRequest {
   string clienteId = 1;
