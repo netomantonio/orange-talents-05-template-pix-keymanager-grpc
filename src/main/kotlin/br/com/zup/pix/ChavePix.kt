@@ -17,7 +17,7 @@ class ChavePix(
     @field:NotNull @Column(nullable = false) val clienteId: UUID,
     @field:NotNull @Enumerated(EnumType.STRING) @Column(nullable = false) val tipo: TipoDeChave,
     @field:NotBlank @Column(unique = true, nullable = false) val chave: String?,
-    @field:NotNull @Enumerated(EnumType.STRING) @Column(nullable = false) val tipoConta: TipoConta,
+    @field:NotNull @Enumerated(EnumType.STRING) @Column(nullable = false) val tipoConta: TipoDeConta,
     @field:Valid @Embedded val conta: ContaAssociada
 ) {
     @Id @GeneratedValue val id: UUID? = null
