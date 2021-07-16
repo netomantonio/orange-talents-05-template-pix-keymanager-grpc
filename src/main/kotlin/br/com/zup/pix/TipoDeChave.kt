@@ -32,7 +32,7 @@ enum class TipoDeChave {
     },
     EMAIL {
         override fun valida(chave: String?, context: ConstraintValidatorContext): Boolean {
-            if (chave.isNullOrBlank()) {
+             if (chave.isNullOrBlank()) {
                 return false
             }
             return EmailValidator().run {

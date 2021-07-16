@@ -16,9 +16,6 @@ class ConstraintViolationExceptionHandler : ExceptionHandler<ConstraintViolation
 
     override fun handle(e: ConstraintViolationException): StatusWithDetails {
 
-        val map = e.constraintViolations.spliterator()
-
-
         val details = BadRequest.newBuilder()
             .addAllFieldViolations(e.constraintViolations.map {
                 BadRequest.FieldViolation.newBuilder()
