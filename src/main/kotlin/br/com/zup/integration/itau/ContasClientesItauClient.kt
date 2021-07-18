@@ -10,4 +10,5 @@ interface ContasClientesItauClient {
 
     @Get("/api/v1/clientes/{clienteId}/contas{?tipo}")
     fun buscaContaTipo(@PathVariable clienteId: String, @QueryValue tipo: String): HttpResponse<DadosContaResponse>
+
 }

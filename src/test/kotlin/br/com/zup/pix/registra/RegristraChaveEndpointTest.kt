@@ -1,6 +1,7 @@
 package br.com.zup.pix.registra
 
 import br.com.zup.*
+import br.com.zup.integration.bcb.*
 import br.com.zup.integration.itau.ContasClientesItauClient
 import br.com.zup.pix.*
 import br.com.zup.util.violations
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 
@@ -29,6 +31,10 @@ internal class RegristraChaveEndpointTest(
 
     @Inject
     lateinit var itauClient: ContasClientesItauClient
+
+    @Inject
+    lateinit var bcbClient: BancoCentralClientPix
+
 
     companion object {
         val CLIENTE_ID = UUID.randomUUID()
@@ -137,6 +143,11 @@ internal class RegristraChaveEndpointTest(
         return Mockito.mock(ContasClientesItauClient::class.java)
     }
 
+    @MockBean(BancoCentralClientPix::class)
+    fun bcbClient(): BancoCentralClientPix? {
+        return Mockito.mock(BancoCentralClientPix::class.java)
+    }
+
     @Factory
     class Clients {
         @Bean
@@ -153,6 +164,42 @@ internal class RegristraChaveEndpointTest(
             agencia = "1218",
             numero = "291900",
             titular = TitularResponse("Tone Max", "12345678910")
+        )
+    }
+
+    private fun createPixKeyRequest(): CreatePixKeyRequest {
+        return CreatePixKeyRequest(
+            keyType = PixKeyType.EMAIL,
+            key = "rponte@gmail.com",
+            bankAccount = bankAccount(),
+            owner = owner()
+        )
+    }
+
+    private fun createPixKeyResponse(): CreatePixKeyResponse {
+        return CreatePixKeyResponse(
+            keyType = PixKeyType.EMAIL,
+            key = "rponte@gmail.com",
+            bankAccount = bankAccount(),
+            owner = owner(),
+            createdAt = LocalDateTime.now()
+        )
+    }
+
+    private fun bankAccount(): BankAccount {
+        return BankAccount(
+            participant = ContaAssociada.ITAU_UNIBANCO_ISPB,
+            branch = "1218",
+            accountNumber = "291900",
+            accountType = BankAccount.AccountType.CACC
+        )
+    }
+
+    private fun owner(): Owner {
+        return Owner(
+            type = Owner.OwnerType.NATURAL_PERSON,
+            name = "Rafael Ponte",
+            taxIdNumber = "63657520325"
         )
     }
 

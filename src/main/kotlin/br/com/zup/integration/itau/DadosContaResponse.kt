@@ -18,6 +18,7 @@ data class DadosContaResponse(
             agencia = this.agencia,
             numeroConta = this.numero
         )
+
     }
 }
 
