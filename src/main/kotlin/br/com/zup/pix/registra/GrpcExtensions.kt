@@ -1,6 +1,6 @@
-package br.com.zup
+package br.com.zup.pix.registra
 
-import br.com.zup.pix.registra.NovaChavePix
+import br.com.zup.*
 import br.com.zup.pix.TipoDeChave
 import br.com.zup.pix.TipoDeConta
 

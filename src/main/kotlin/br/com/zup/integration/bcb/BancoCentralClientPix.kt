@@ -1,6 +1,7 @@
 package br.com.zup.integration.bcb
 
 import br.com.zup.pix.*
+import br.com.zup.pix.carrega.ChavePixInfo
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
@@ -20,6 +21,10 @@ interface BancoCentralClientPix {
     @Produces(MediaType.APPLICATION_XML)
     fun remover(@PathVariable key: String, @Body request: DeletePixKeyRequest): HttpResponse<DeletePixKeyResponse>
 
+    @Get("/{key}", consumes = [MediaType.APPLICATION_XML], produces = [MediaType.APPLICATION_XML])
+    fun findByKey(@PathVariable key: String): HttpResponse<PixKeyDetailsResponse>
+
+
 }
 
 data class DeletePixKeyResponse(
@@ -33,12 +38,12 @@ data class DeletePixKeyRequest(
     val participant: String = ContaAssociada.ITAU_UNIBANCO_ISPB
 )
 
-class CreatePixKeyResponse(
+data class CreatePixKeyResponse(
     val keyType: PixKeyType,
     val key: String,
     val bankAccount: BankAccount,
     val owner: Owner,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime?
 )
 
 data class CreatePixKeyRequest(
@@ -67,6 +72,33 @@ data class CreatePixKeyRequest(
         }
     }
 }
+
+data class PixKeyDetailsResponse(
+    val keyType: PixKeyType,
+    val key: String,
+    val bankAccount: BankAccount,
+    val owner: Owner,
+    val createdAt: LocalDateTime
+) {
+    fun toModel(): ChavePixInfo {
+        return ChavePixInfo(
+            tipo = keyType.domainType!!,
+            chave = key,
+            tipoConta = when (bankAccount.accountType){
+                BankAccount.AccountType.CACC -> TipoDeConta.CONTA_CORRENTE
+                BankAccount.AccountType.SVGS -> TipoDeConta.CONTA_POUPANCA
+            },
+            conta = ContaAssociada(
+                instituicao = Instituicoes.nome(bankAccount.participant),
+                nomeTitular = owner.name,
+                cpfTitular = owner.taxIdNumber,
+                agencia = bankAccount.branch,
+                numeroConta = bankAccount.accountNumber
+            )
+        )
+    }
+}
+
 
 enum class PixKeyType(val domainType: TipoDeChave?) {
     CPF(TipoDeChave.CPF),

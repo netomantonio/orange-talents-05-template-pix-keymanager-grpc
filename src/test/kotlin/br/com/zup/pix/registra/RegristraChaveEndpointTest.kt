@@ -2,7 +2,7 @@ package br.com.zup.pix.registra
 
 import br.com.zup.*
 import br.com.zup.integration.bcb.*
-import br.com.zup.integration.itau.ContasClientesItauClient
+import br.com.zup.integration.itau.*
 import br.com.zup.pix.*
 import br.com.zup.util.violations
 import io.grpc.*
@@ -50,6 +50,9 @@ internal class RegristraChaveEndpointTest(
         // cenário
         `when`(itauClient.buscaContaTipo(clienteId = CLIENTE_ID.toString(), tipo = "CONTA_CORRENTE"))
             .thenReturn(HttpResponse.ok(dadosDaContaResponse()))
+
+        `when`(bcbClient.registrar(createPixKeyRequest()))
+            .thenReturn(HttpResponse.created(createPixKeyResponse()))
 
 
         // ação
@@ -138,6 +141,34 @@ internal class RegristraChaveEndpointTest(
         }
     }
 
+    @Test
+    fun `nao deve registrar chave pix quando nao for possivel registrar chave no BCB`(){
+
+        // cenário
+        `when`(itauClient.buscaContaTipo(clienteId = CLIENTE_ID.toString(), tipo = "CONTA_CORRENTE"))
+            .thenReturn(HttpResponse.ok(dadosDaContaResponse()))
+
+        `when`(bcbClient.registrar(createPixKeyRequest()))
+            .thenReturn(HttpResponse.badRequest())
+
+        // ação
+        val throws = assertThrows<StatusRuntimeException> {
+            grpcClient.registrar(RegistraChaveRequest.newBuilder()
+                .setClienteId(CLIENTE_ID.toString())
+                .setTipoChave(TipoChave.EMAIL)
+                .setChave("tone@gmail.com")
+                .setTipoConta(TipoConta.CONTA_CORRENTE)
+                .build())
+        }
+
+        // validação
+        with(throws) {
+            assertEquals(Status.FAILED_PRECONDITION.code, status.code)
+            assertEquals("Erro ao registrar chave Pix no Banco Central do Brasil (BCB)", status.description)
+        }
+    }
+
+
     @MockBean(ContasClientesItauClient::class)
     fun itauClient(): ContasClientesItauClient? {
         return Mockito.mock(ContasClientesItauClient::class.java)
@@ -163,14 +194,14 @@ internal class RegristraChaveEndpointTest(
             instituicao = InstituicaoResponse("UNIBANCO ITAU SA", ContaAssociada.ITAU_UNIBANCO_ISPB),
             agencia = "1218",
             numero = "291900",
-            titular = TitularResponse("Tone Max", "12345678910")
+            titular = TitularResponse("Tone Max", "02712505182")
         )
     }
 
     private fun createPixKeyRequest(): CreatePixKeyRequest {
         return CreatePixKeyRequest(
             keyType = PixKeyType.EMAIL,
-            key = "rponte@gmail.com",
+            key = "tone@gmail.com",
             bankAccount = bankAccount(),
             owner = owner()
         )
@@ -179,7 +210,7 @@ internal class RegristraChaveEndpointTest(
     private fun createPixKeyResponse(): CreatePixKeyResponse {
         return CreatePixKeyResponse(
             keyType = PixKeyType.EMAIL,
-            key = "rponte@gmail.com",
+            key = "tone@gmail.com",
             bankAccount = bankAccount(),
             owner = owner(),
             createdAt = LocalDateTime.now()
@@ -198,8 +229,8 @@ internal class RegristraChaveEndpointTest(
     private fun owner(): Owner {
         return Owner(
             type = Owner.OwnerType.NATURAL_PERSON,
-            name = "Rafael Ponte",
-            taxIdNumber = "63657520325"
+            name = "Tone Max",
+            taxIdNumber = "02712505182"
         )
     }
 
@@ -212,11 +243,11 @@ internal class RegristraChaveEndpointTest(
             clienteId = clienteId,
             tipo = tipo,
             chave = chave,
-            tipoConta = br.com.zup.pix.TipoDeConta.CONTA_CORRENTE,
+            tipoConta = TipoDeConta.CONTA_CORRENTE,
             conta = ContaAssociada(
                 instituicao = "UNIBANCO ITAU",
-                nomeTitular = "Rafael Ponte",
-                cpfTitular = "63657520325",
+                nomeTitular = "Tone Max",
+                cpfTitular = "02712505182",
                 agencia = "1218",
                 numeroConta = "291900"
             )

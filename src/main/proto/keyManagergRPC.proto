@@ -5,6 +5,8 @@ option java_package = "br.com.zup";
 option java_outer_classname = "KeyManagergRPC";
 option objc_class_prefix = "HLW";
 
+import "google/protobuf/timestamp.proto";
+
 package br.com.zup;
 
 service KeyManagerRegistraGrpcService {
@@ -14,6 +16,45 @@ service KeyManagerRegistraGrpcService {
 service KeyManagerRemoveGrpcService{
   rpc remover (RemoveChaveRequest) returns (RemoveChaveResponse) {}
 }
+
+service KeyManagerCarregaGrpcService {
+  rpc carregar (CarregaChaveRequest) returns (CarregaChaveResponse) {}
+}
+
+message CarregaChaveRequest {
+  message FiltroPorPixId {
+    string clienteId = 1;
+    string pixId = 2;
+  }
+  oneof filtro {
+    FiltroPorPixId pixId = 1;
+    string chave = 2;
+  }
+}
+
+message CarregaChaveResponse {
+  message ChavePix {
+    message ContaInfo {
+      TipoConta tipo = 1;
+      string instituicao = 2;
+      string nomeTitular = 3;
+      string cpfTitular = 4;
+      string agencia = 5;
+      string numeroConta = 6;
+    }
+
+    TipoChave tipo = 1;
+    string chave =2;
+    ContaInfo conta = 3;
+    google.protobuf.Timestamp criadaEm = 4;
+  }
+
+  string clienteId = 1;
+  string pixId = 2;
+  ChavePix chave = 3;
+}
+
+
 
 message RemoveChaveRequest {
   string pixId = 1;
