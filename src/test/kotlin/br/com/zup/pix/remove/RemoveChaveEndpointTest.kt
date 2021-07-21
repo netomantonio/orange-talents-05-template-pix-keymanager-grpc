@@ -119,7 +119,7 @@ internal class RemoveChaveEndpointTest(
     }
 
     @Factory
-    class Clients {
+    class RemoveClients {
         @Bean
         fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel):
                 KeyManagerRemoveGrpcServiceGrpc.KeyManagerRemoveGrpcServiceBlockingStub{

@@ -180,7 +180,7 @@ internal class RegristraChaveEndpointTest(
     }
 
     @Factory
-    class Clients {
+    class RegistraClients {
         @Bean
         fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel):
                 KeyManagerRegistraGrpcServiceGrpc.KeyManagerRegistraGrpcServiceBlockingStub{
