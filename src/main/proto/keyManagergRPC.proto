@@ -21,6 +21,30 @@ service KeyManagerCarregaGrpcService {
   rpc carregar (CarregaChaveRequest) returns (CarregaChaveResponse) {}
 }
 
+service KeyManagerListaGrpcService {
+  rpc listar (ListaChavesRequest) returns (ListaChavesResponse) {}
+}
+
+message ListaChavesRequest {
+  string clienteId = 1;
+
+}
+
+message ListaChavesResponse {
+  message ChavePix {
+    string pixId = 1;
+    TipoChave tipoChave = 2;
+    string chave = 3;
+    TipoConta tipoConta = 4;
+    google.protobuf.Timestamp criadaEm = 5;
+
+  }
+
+  string clienteId = 1;
+  repeated ChavePix chaves = 2;
+}
+
+
 message CarregaChaveRequest {
   message FiltroPorPixId {
     string clienteId = 1;
@@ -44,7 +68,7 @@ message CarregaChaveResponse {
     }
 
     TipoChave tipo = 1;
-    string chave =2;
+    string chave = 2;
     ContaInfo conta = 3;
     google.protobuf.Timestamp criadaEm = 4;
   }

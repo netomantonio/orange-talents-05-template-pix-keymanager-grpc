@@ -29,3 +29,8 @@ itau:
 bcb:
   pix:
     keys: ${BCB_PIX_URL:`http://localhost:8082/api/v1/pix/keys`}
+
+
+jackson:
+  serialization:
+    writeDateAsTimestamps: false

@@ -1,4 +1,4 @@
-package br.com.zup.pix.registra
+package br.com.zup.integration.itau
 
 import br.com.zup.pix.ContaAssociada
 
