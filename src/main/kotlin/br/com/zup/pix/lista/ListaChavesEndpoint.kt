@@ -1,10 +1,12 @@
 package br.com.zup.pix.lista
 
 import br.com.zup.*
+import br.com.zup.integration.itau.ContasClientesItauClient
 import br.com.zup.pix.ChavePixRepository
 import br.com.zup.shared.grpc.ErrorHandler
 import com.google.protobuf.Timestamp
 import io.grpc.stub.StreamObserver
+import io.micronaut.http.HttpStatus
 import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
@@ -13,19 +15,19 @@ import javax.inject.Singleton
 @ErrorHandler
 @Singleton
 class ListaChavesEndpoint(
-    @Inject private val repository: ChavePixRepository
+    @Inject private val repository: ChavePixRepository,
+    @Inject private val itauClient: ContasClientesItauClient
 ) : KeyManagerListaGrpcServiceGrpc.KeyManagerListaGrpcServiceImplBase() {
 
     override fun listar(request: ListaChavesRequest, responseObserver: StreamObserver<ListaChavesResponse>) {
 
         if (request.clienteId.isNullOrBlank()) throw IllegalArgumentException("Cliente ID deve estar preenchido")
 
-//        val defaultPageable = Pageable.from(0, 10)
-//        val provavelClient = itauClient.buscaCliente(request.clienteId)
-//
-//        if (provavelClient.status.code == HttpStatus.NOT_FOUND.code){
-//            throw IllegalStateException("Cliente ID '${request.clienteId}'")
-//        }
+        val provavelClient = itauClient.buscaCliente(request.clienteId)
+
+        if (provavelClient.status.code == HttpStatus.NOT_FOUND.code){
+            throw IllegalStateException("Cliente ID '${request.clienteId}' não existente")
+        }
         val uuidClienteId = UUID.fromString(request.clienteId)
 
         val chaves = repository.findAllByClienteId(uuidClienteId).map{
